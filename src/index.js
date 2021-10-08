@@ -2,12 +2,12 @@ import "./style.css";
 import "bootstrap/dist/css/bootstrap.css";
 import * as bootstrap from "bootstrap";
 import "@popperjs/core";
-import "./jokeFacade";
-import jokeFacade from "./jokeFacade";
-fetchAllPersons();
+getPerson();
 
 document.getElementById("all-content").style.display = "block";
-
+let result = "";
+let phone = "";
+let hobby = "";
 /* 
   Add your JavaScript for all exercises Below or in separate js-files, which you must the import above
 */
@@ -40,8 +40,95 @@ function fetchAllPersons() {
 }
 
 /* JS For Exercise-2 below */
+// function fetchSinglePersons() {
+//   let url = "https://kofoednet.systems/CA1/api/person/all";
+//   fetch(url)
+//     .then((res) => res.json())
+//     .then(users => {const userdata = users.map(user =>
+//       `
+//     <tr><td>${userdata.dto_fname}</td></tr>
+//       `.join("");
+//       document.getElementById("singlePerson").innerHTML = singlePerson;
+//     });
+// }
+
+function getPerson() {
+  let url = "https://kofoednet.systems/CA1/api/person/1";
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      let singlePersonRecord = document.getElementById("singlePerson");
+      singlePersonRecord.innerHTML = renderObjectToHTML(data);
+    });
+}
 
 /* JS For Exercise-3 below */
+
+/*Help function */
+function makeOptions(method, body) {
+  var opts = {
+    method: method,
+    headers: {
+      "Content-type": "application/json",
+      Accept: "application/json",
+    },
+  };
+  if (body) {
+    opts.body = JSON.stringify(body);
+  }
+  return opts;
+}
+
+function handleHttpErrors(res) {
+  if (!res.ok) {
+    return Promise.reject({ status: res.status, fullError: res.json() });
+  }
+  return res.json();
+}
+
+function errorHandling(err) {
+  console.log(err);
+  if (err.status) {
+    err.fullError.then((e) => console.log(e.message));
+  } else {
+    console.log("Network error");
+  }
+}
+
+function renderObjectToHTML(myPersonObj) {
+  phones(myPersonObj);
+  hobbies(myPersonObj);
+  result = `Fornavn: ${myPersonObj.dto_fName}<br/>
+  Efternavn: ${myPersonObj.dto_lName}<br/>
+  Email: ${myPersonObj.dto_email}<br/>
+  
+Tlf: ${phone}<br/>
+
+  Postnr: ${myPersonObj.dto_zipCode}<br/>
+  Gade: ${myPersonObj.dto_street}<br/>
+  By: ${myPersonObj.dto_city}<br/>
+    
+  Hobbier: ${hobby}<br/>
+  `;
+
+  return result;
+}
+
+function phones(myPersonObj) {
+  const phonearray = myPersonObj.dto_phones;
+  phonearray.forEach((element) => {
+    phone = phone + element.dto_number;
+  });
+  phone;
+}
+
+function hobbies(myPersonObj) {
+  const hobbyarray = myPersonObj.dto_hobbies;
+  hobbyarray.forEach((element) => {
+    hobby = hobby + element.dto_name;
+  });
+  hobby;
+}
 
 /* 
 Do NOT focus on the code below, UNLESS you want to use this code for something different than
@@ -61,6 +148,7 @@ function menuItemClicked(evt) {
   switch (id) {
     case "ex1":
       hideAllShowOne("ex1_html");
+      fetchAllPersons();
       break;
     case "ex2":
       hideAllShowOne("ex2_html");
