@@ -14,28 +14,32 @@ let hobby = "";
 /* JS For Exercise-1 below */
 
 function fetchAllPersons() {
-  let url = "https://kofoednet.systems/CA1/api/person/all";
-  let allPersons = document.getElementById("allPersons");
-  fetch(url)
-    .then((res) => res.json())
+  fetch(`https://kofoednet.systems/CA1/api/person/all`)
+    .then(handleHttpErrors)
     .then((data) => {
-      let newArray = data.all.map(
-        (x) =>
-          `<tr><td>${x.dto_fName}</td><td>${x.dto_lName}</td><td>${
-            x.dto_email
-          }</td><td>${x.dto_phones
-            .map((x) => x.dto_number)
-            .join(",")}</td><td>${x.dto_zipCode}</td><td>${
-            x.dto_street
-          }</td><td>${x.dto_city}</td><td>${x.dto_hobbies
-            .map((x) => x.dto_name)
-            .join(",")}</td></tr>`
-      );
-      allPersons.innerHTML = `<table>
-                  <thead><th>Fornavn</th><th>Efternavn</th><th>Email</th><th>Tlf</th><th>zip</th><th>Gade</th><th>By</th><th>Hobbies</th></thead>
-                  ${newArray.join("")}
-              </table>`;
-    });
+      const allRows = data.all.map((p) => getPersonTableRow(p));
+      document.getElementById("tablerowsAllPersons").innerHTML =
+        allRows.join("");
+    })
+    .catch(errorHandling);
+}
+
+function getPersonTableRow(p) {
+  return `<tr>
+    <td>${p.dto_id}</td>
+    <td>${p.dto_fName}</td>
+    <td>${p.dto_lName}</td>
+    <td>${p.dto_email}</td>
+    <td>${p.dto_phones.map((x) => x.dto_number).join(",")}</td>
+    <td>${p.dto_zipCode}</td>
+    <td>${p.dto_street}</td>
+    <td>${p.dto_city}</td>
+    <td>${p.dto_hobbies.map((x) => x.dto_name).join(",")}</td>
+    <td>
+      <input id="${p.id}" type="button" name="edit" value="edit"/>
+      <input id="${p.id}" type="button" name="delete" value="delete"/>
+    </td>
+    </tr>`;
 }
 
 /* JS For Exercise-2 below */
