@@ -4,14 +4,89 @@ import * as bootstrap from "bootstrap";
 import "@popperjs/core";
 
 document.getElementById("all-content").style.display = "block";
+let editModalElement = document.getElementById("editPersonModal");
+let editModal = new bootstrap.Modal(editModalElement);
 let result = "";
-let phone = "";
-let hobby = "";
+
 /* 
   Add your JavaScript for all exercises Below or in separate js-files, which you must the import above
 */
 
 /* JS For Exercise-1 below */
+document
+  .getElementById("tablerowsAllPersons")
+  .addEventListener("click", (event) => {
+    event.preventDefault();
+    const node = event.target;
+    const name = node.getAttribute("name");
+    const id = node.getAttribute("id");
+
+    if (name == "edit") {
+      editPerson(id);
+    }
+    if (name == "delete") {
+      deletePerson(id);
+    }
+  });
+
+function editPerson(id) {
+  fetch("https://kofoednet.systems/CA1/api/person/" + id)
+    .then(handleHttpErrors)
+    .then((data) => {
+      document.getElementById("edit_id").value = data.dto_id;
+      document.getElementById("fName").value = data.dto_fName;
+      document.getElementById("lName").value = data.dto_lName;
+      document.getElementById("email").value = data.dto_email;
+      document.getElementById("tlf").value = data.dto_phones
+        .map((x) => x.dto_number)
+        .join(",");
+      document.getElementById("postnr").value = data.dto_zipCode;
+      document.getElementById("gadenavn").value = data.dto_street;
+      document.getElementById("by").value = data.dto_city;
+      document.getElementById("hobby").value = data.dto_hobbies
+        .map((x) => x.dto_name)
+        .join(",");
+      editModal.toggle();
+    })
+    .catch(errorHandling);
+}
+
+document.getElementById("formsave").addEventListener(`click`, updateperson);
+
+function updateperson() {
+  let dtoId = document.getElementById("edit_id").value;
+
+  const personobj = {
+    dto_fName: document.getElementById("fName").value,
+    dto_lName: document.getElementById("lName").value,
+    dto_email: document.getElementById("email").value,
+    dto_phones: [
+      {
+        dto_number: document.getElementById("tlf").value,
+      },
+    ],
+    dto_zipCode: document.getElementById("postnr").value,
+    dto_street: document.getElementById("gadenavn").value,
+    dto_city: document.getElementById("by").value,
+    dto_hobbies: [
+      {
+        dto_name: document.getElementById("hobby").value,
+      },
+    ],
+  };
+
+  const options = makeOptions(`PUT`, personobj);
+
+  fetch("https://kofoednet.systems/CA1/api/person/" + dtoId, options)
+    .then(handleHttpErrors)
+    .then((data) => {
+      editModal.toggle();
+      fetchAllPersons();
+    })
+    .catch(errorHandling);
+}
+
+function deletePerson(id) {}
 
 function fetchAllPersons() {
   fetch(`https://kofoednet.systems/CA1/api/person/all`)
@@ -36,8 +111,8 @@ function getPersonTableRow(p) {
     <td>${p.dto_city}</td>
     <td>${p.dto_hobbies.map((x) => x.dto_name).join(",")}</td>
     <td>
-      <input id="${p.id}" type="button" name="edit" value="edit"/>
-      <input id="${p.id}" type="button" name="delete" value="delete"/>
+      <input id="${p.dto_id}" type="button" name="edit" value="edit"/>
+      <input id="${p.dto_id}" type="button" name="delete" value="delete"/>
     </td>
     </tr>`;
 }
@@ -106,40 +181,22 @@ function errorHandling(err) {
 }
 
 function renderObjectToHTML(myPersonObj) {
-  phones(myPersonObj);
-  hobbies(myPersonObj);
+  // phones(myPersonObj);
+  // hobbies(myPersonObj);
   result = `Fornavn: ${myPersonObj.dto_fName}<br/>
   Efternavn: ${myPersonObj.dto_lName}<br/>
   Email: ${myPersonObj.dto_email}<br/>
   
-Tlf: ${phone}<br/>
+Tlf: ${myPersonObj.dto_phones.map((x) => x.dto_number).join(",")}<br/>
 
   Postnr: ${myPersonObj.dto_zipCode}<br/>
   Gade: ${myPersonObj.dto_street}<br/>
   By: ${myPersonObj.dto_city}<br/>
     
-  Hobbier: ${hobby}<br/>
+  Hobbier: ${myPersonObj.dto_hobbies.map((x) => x.dto_name).join(",")}<br/>
   `;
 
   return result;
-}
-
-function phones(myPersonObj) {
-  phone = "";
-  const phonearray = myPersonObj.dto_phones;
-  phonearray.forEach((element) => {
-    phone = phone + element.dto_number + ",";
-  });
-  phone;
-}
-
-function hobbies(myPersonObj) {
-  hobby = "";
-  const hobbyarray = myPersonObj.dto_hobbies;
-  hobbyarray.forEach((element) => {
-    hobby = hobby + element.dto_name + ",";
-  });
-  hobby;
 }
 
 /* 
