@@ -2,7 +2,6 @@ import "./style.css";
 import "bootstrap/dist/css/bootstrap.css";
 import * as bootstrap from "bootstrap";
 import "@popperjs/core";
-getPerson();
 
 document.getElementById("all-content").style.display = "block";
 let result = "";
@@ -40,22 +39,19 @@ function fetchAllPersons() {
 }
 
 /* JS For Exercise-2 below */
-// function fetchSinglePersons() {
-//   let url = "https://kofoednet.systems/CA1/api/person/all";
-//   fetch(url)
-//     .then((res) => res.json())
-//     .then(users => {const userdata = users.map(user =>
-//       `
-//     <tr><td>${userdata.dto_fname}</td></tr>
-//       `.join("");
-//       document.getElementById("singlePerson").innerHTML = singlePerson;
-//     });
-// }
 
-function getPerson() {
-  let url = "https://kofoednet.systems/CA1/api/person/1";
+let singlePersonID = document.getElementById("singlePersonID");
+
+singlePersonID.addEventListener("click", (event) => {
+  event.preventDefault();
+  let getSinglePerson = document.getElementById("getSinglePerson");
+  getPerson(getSinglePerson.value);
+});
+
+function getPerson(id) {
+  let url = "https://kofoednet.systems/CA1/api/person/" + id;
   fetch(url)
-    .then((res) => res.json())
+    .then(invalidURL)
     .then((data) => {
       let singlePersonRecord = document.getElementById("singlePerson");
       singlePersonRecord.innerHTML = renderObjectToHTML(data);
@@ -65,6 +61,16 @@ function getPerson() {
 /* JS For Exercise-3 below */
 
 /*Help function */
+
+function invalidURL(res) {
+  if (!res.ok) {
+    let singlePersonRecord = document.getElementById("singlePerson");
+    singlePersonRecord.innerHTML = "Ingen person med dette ID fundet";
+    return Promise.reject({ status: res.status, fullError: res.json() });
+  }
+  return res.json();
+}
+
 function makeOptions(method, body) {
   var opts = {
     method: method,
@@ -115,17 +121,19 @@ Tlf: ${phone}<br/>
 }
 
 function phones(myPersonObj) {
+  phone = "";
   const phonearray = myPersonObj.dto_phones;
   phonearray.forEach((element) => {
-    phone = phone + element.dto_number;
+    phone = phone + element.dto_number + ",";
   });
   phone;
 }
 
 function hobbies(myPersonObj) {
+  hobby = "";
   const hobbyarray = myPersonObj.dto_hobbies;
   hobbyarray.forEach((element) => {
-    hobby = hobby + element.dto_name;
+    hobby = hobby + element.dto_name + ",";
   });
   hobby;
 }
