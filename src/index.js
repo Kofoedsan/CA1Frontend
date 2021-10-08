@@ -206,8 +206,8 @@ the Period2-week2-day3 Exercises
 
 function hideAllShowOne(idToShow) {
   document.getElementById("about_html").style = "display:none";
-  document.getElementById("ex1_html").style = "display:none";
-  document.getElementById("ex2_html").style = "display:none";
+  document.getElementById("getAllPersons_html").style = "display:none";
+  document.getElementById("getSinglePersonRef_html").style = "display:none";
   document.getElementById("ex3_html").style = "display:none";
   document.getElementById(idToShow).style = "display:block";
 }
@@ -215,12 +215,12 @@ function hideAllShowOne(idToShow) {
 function menuItemClicked(evt) {
   const id = evt.target.id;
   switch (id) {
-    case "ex1":
-      hideAllShowOne("ex1_html");
+    case "getAllPersons":
+      hideAllShowOne("getAllPersons_html");
       fetchAllPersons();
       break;
-    case "ex2":
-      hideAllShowOne("ex2_html");
+    case "getSinglePersonRef":
+      hideAllShowOne("getSinglePersonRef_html");
       break;
     case "ex3":
       hideAllShowOne("ex3_html");
