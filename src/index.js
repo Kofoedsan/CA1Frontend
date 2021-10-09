@@ -143,8 +143,8 @@ function getPerson(id) {
   fetch(url)
     .then(invalidURL)
     .then((data) => {
-      let singlePersonRecord = document.getElementById("singlePerson");
-      singlePersonRecord.innerHTML = renderObjectToHTML(data);
+      document.getElementById("singlePerson").innerHTML =
+        renderObjectToHTML(data);
     });
 }
 
@@ -181,7 +181,8 @@ function addPerson() {
     .then(handleHttpErrors)
     .then((data) => {
       addModal.toggle();
-      console.log(data);
+      fetchAllPersons();
+      hideAllShowOne("getAllPersons_html");
     })
     .catch(errorHandling);
 }
