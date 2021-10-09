@@ -6,6 +6,8 @@ import "@popperjs/core";
 document.getElementById("all-content").style.display = "block";
 let editModalElement = document.getElementById("editPersonModal");
 let editModal = new bootstrap.Modal(editModalElement);
+let addModalElement = document.getElementById("addPersonModal");
+let addModal = new bootstrap.Modal(addModalElement);
 let result = "";
 
 /* 
@@ -86,7 +88,16 @@ function updateperson() {
     .catch(errorHandling);
 }
 
-function deletePerson(id) {}
+function deletePerson(id) {
+  const deloptions = makeOptions(`DELETE`);
+  fetch("https://kofoednet.systems/CA1/api/person/" + id, deloptions)
+    .then(handleHttpErrors)
+    .then((removed) => {
+      fetchAllPersons();
+      alert("Brugeren med id " + id + " er fjernet");
+    })
+    .catch(errorHandling);
+}
 
 function fetchAllPersons() {
   fetch(`https://kofoednet.systems/CA1/api/person/all`)
@@ -138,6 +149,42 @@ function getPerson(id) {
 }
 
 /* JS For Exercise-3 below */
+document.getElementById("add").addEventListener("click", (event) => {
+  event.preventDefault();
+  addModal.toggle();
+});
+
+document.getElementById("addformsave").addEventListener(`click`, addPerson);
+
+function addPerson() {
+  const personData = {
+    dto_fName: document.getElementById("addfName").value,
+    dto_lName: document.getElementById("addlName").value,
+    dto_email: document.getElementById("addemail").value,
+    dto_phones: [
+      {
+        dto_number: document.getElementById("addtlf").value,
+      },
+    ],
+    dto_zipCode: document.getElementById("addpostnr").value,
+    dto_street: document.getElementById("addgadenavn").value,
+    dto_city: document.getElementById("addby").value,
+    dto_hobbies: [
+      {
+        dto_name: document.getElementById("addhobby").value,
+      },
+    ],
+  };
+  const addoptions = makeOptions(`POST`, personData);
+
+  fetch("https://kofoednet.systems/CA1/api/person/", addoptions)
+    .then(handleHttpErrors)
+    .then((data) => {
+      addModal.toggle();
+      console.log(data);
+    })
+    .catch(errorHandling);
+}
 
 /*Help function */
 
@@ -181,8 +228,6 @@ function errorHandling(err) {
 }
 
 function renderObjectToHTML(myPersonObj) {
-  // phones(myPersonObj);
-  // hobbies(myPersonObj);
   result = `Fornavn: ${myPersonObj.dto_fName}<br/>
   Efternavn: ${myPersonObj.dto_lName}<br/>
   Email: ${myPersonObj.dto_email}<br/>
@@ -208,7 +253,7 @@ function hideAllShowOne(idToShow) {
   document.getElementById("about_html").style = "display:none";
   document.getElementById("getAllPersons_html").style = "display:none";
   document.getElementById("getSinglePersonRef_html").style = "display:none";
-  document.getElementById("ex3_html").style = "display:none";
+  document.getElementById("addPerson_html").style = "display:none";
   document.getElementById(idToShow).style = "display:block";
 }
 
@@ -222,8 +267,8 @@ function menuItemClicked(evt) {
     case "getSinglePersonRef":
       hideAllShowOne("getSinglePersonRef_html");
       break;
-    case "ex3":
-      hideAllShowOne("ex3_html");
+    case "addPerson":
+      hideAllShowOne("addPerson_html");
       break;
     default:
       hideAllShowOne("about_html");
